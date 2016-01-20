@@ -39,7 +39,12 @@ class Client(asyncore.dispatcher):
 
     def read_data(self):
         len_data = int(self.recv(8))
-        return self.recv(len_data)
+        data = ""
+        while len_data:
+            data += self.recv(1)
+            len_data -= 1
+
+        return data
 
     def handle_close(self):
         self.close()

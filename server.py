@@ -10,7 +10,7 @@ class Handler(asyncore.dispatcher_with_send):
 
     def send_data_test(self, data):
         Handler.semaphore_thread.acquire()
-        
+
         sleep = random.SystemRandom().randint(0, 10)
         time.sleep(sleep)
         self.send_data("Slept " + str(sleep) + " - " + data)
@@ -21,7 +21,7 @@ class Handler(asyncore.dispatcher_with_send):
         data = self.read_data()
         print data
 
-        threading.Thread(target=self.send_data_test, args=data).start()
+        threading.Thread(target=self.send_data_test, args=(data,)).start()
 
     def handle_write(self):
         self.send_data("")
@@ -31,7 +31,12 @@ class Handler(asyncore.dispatcher_with_send):
 
     def read_data(self):
         len_data = int(self.recv(8))
-        return self.recv(len_data)
+        data = ""
+        while len_data:
+            data += self.recv(1)
+            len_data -= 1
+
+        return data
 
     def handle_close(self):
         self.close()
