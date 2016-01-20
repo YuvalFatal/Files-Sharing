@@ -20,7 +20,7 @@ class Client(asyncore.dispatcher):
         if msvcrt.kbhit():
             key = msvcrt.getch()
 
-            if key == "\r" and self.message:
+            if key == "\r" and len(self.message) != 0:
                 self.send_data(self.message)
                 self.message = ""
                 print "\r"
@@ -46,7 +46,7 @@ class Client(asyncore.dispatcher):
 
 
 def main(server_ip, port):
-    client = Client(server_ip, port)
+    Client(server_ip, port)
     asyncore.loop()
 
 if __name__ == '__main__':

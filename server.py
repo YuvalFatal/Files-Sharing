@@ -1,16 +1,28 @@
 import asyncore
 import socket
+import time
+import random
+import threading
 
 
 class Handler(asyncore.dispatcher_with_send):
+    semaphore_thread = threading.Semaphore(10)
+
+    def send_data_test(self, data):
+        sleep = random.SystemRandom().randint(0, 10)
+        time.sleep(sleep)
+        self.send_data("Slept " + str(sleep) + " - " + data)
 
     def handle_read(self):
         data = self.read_data()
         print data
-        self.send_data(data)
+
+        Handler.semaphore_thread.acquire()
+        threading.Thread(target=self.send_data_test, args=data).start()
+        Handler.semaphore_thread.release()
 
     def handle_write(self):
-        self.send_data(self, "")
+        self.send_data("")
 
     def send_data(self, data):
         self.send(str(len(data)).zfill(8) + data)
@@ -36,7 +48,7 @@ class Server(asyncore.dispatcher):
         Handler(sock)
 
 def main(my_ip, port):
-    server = Server(my_ip, port)
+    Server(my_ip, port)
     asyncore.loop()
 
 if __name__ == "__main__":
