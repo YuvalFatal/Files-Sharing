@@ -5,12 +5,19 @@ import socket
 class Handler(asyncore.dispatcher_with_send):
 
     def handle_read(self):
-        data = self.recv(1024)
+        data = self.read_data()
         print data
-        self.send(data)
+        self.send_data(data)
 
-    def handle_write(self, data="ERROR"):
-        self.send(data)
+    def handle_write(self):
+        self.send_data(self, "")
+
+    def send_data(self, data):
+        self.send(str(len(data)).zfill(8) + data)
+
+    def read_data(self):
+        len_data = int(self.recv(8))
+        return self.recv(len_data)
 
     def handle_close(self):
         self.close()
